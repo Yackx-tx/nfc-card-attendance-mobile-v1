@@ -10,6 +10,7 @@
     "dev": "node --loader ts-node/esm src/server.ts",
     "migrate": "node --loader ts-node/esm src/db/migrator.ts",
     "test": "vitest run",
+    "test:simulate-sync": "node --loader ts-node/esm test/simulate-sync.ts",
     "clean": "rm -rf dist"
   },
   "dependencies": {

@@ -230,11 +230,12 @@ export async function processSingleScanEvent(
     );
     const dbEventId = eventInsertRows[0].id;
 
-    // Insert attendance record
+    // Insert attendance record safely with ON CONFLICT DO NOTHING to prevent aborting transaction
     const { rows: attRows } = await executor.query(
       `INSERT INTO attendance_records (
         organization_id, session_id, person_id, first_event_id, marked_present_at, is_late, source
        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (session_id, person_id) DO NOTHING
        RETURNING marked_present_at`,
       [
         organizationId,
@@ -247,18 +248,8 @@ export async function processSingleScanEvent(
       ]
     );
 
-    return {
-      eventId: event.eventId,
-      outcome: 'ACCEPTED',
-      personId: card.person_id,
-      personName: card.full_name,
-      isLate,
-      markedPresentAt: new Date(attRows[0].marked_present_at).toISOString(),
-    };
-  } catch (err: unknown) {
-    // Unique violation error code in PostgreSQL is 23505
-    if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === '23505') {
-      // Check if duplicate on (session_id, person_id)
+    if (attRows.length === 0) {
+      // Record already existed for this person in this session -> Duplicate outcome
       await executor.query(
         `UPDATE attendance_events
          SET outcome = 'DUPLICATE', outcome_reason = 'ALREADY_RECORDED'
@@ -274,6 +265,16 @@ export async function processSingleScanEvent(
         personName: card.full_name,
       };
     }
+
+    return {
+      eventId: event.eventId,
+      outcome: 'ACCEPTED',
+      personId: card.person_id,
+      personName: card.full_name,
+      isLate,
+      markedPresentAt: new Date(attRows[0].marked_present_at).toISOString(),
+    };
+  } catch (err: unknown) {
     throw err;
   }
 }

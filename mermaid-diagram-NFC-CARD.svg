@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 821.4279999999999 984.5000000000001" width="821.4279999999999" height="984.5000000000001" style="--bg:#18181B;--fg:#F4F4F5;--line:#71717A;--muted:#A1A1AA;--surface:#27272A;--border:#3F3F46;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<g class="subgraph" data-id="Clients" data-label="Client Layer">
+  <rect x="213.676" y="282.1" width="567.7519999999998" height="113.80000000000001" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="213.676" y="282.1" width="567.7519999999998" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="225.676" y="296.1" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Client Layer</text>
+</g>
+<g class="subgraph" data-id="Contracts" data-label="Contracts Layer">
+  <rect x="200.39474999999996" y="40" width="331.8179999999999" height="113.80000000000001" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="200.39474999999996" y="40" width="331.8179999999999" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="212.39474999999996" y="54" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Contracts Layer</text>
+</g>
+<g class="subgraph" data-id="Service" data-label="Authoritative Service Layer">
+  <rect x="105.52725" y="524.2" width="509.2129999999999" height="215.60000000000002" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="105.52725" y="524.2" width="509.2129999999999" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="117.52725" y="538.2" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Authoritative Service Layer</text>
+</g>
+<g class="subgraph" data-id="Storage" data-label="Authoritative Storage">
+  <rect x="354.4287499999999" y="799.8000000000001" width="239.93399999999997" height="144.7" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="354.4287499999999" y="799.8000000000001" width="239.93399999999997" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="366.4287499999999" y="813.8000000000001" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">Authoritative Storage</text>
+</g>
+<polyline class="edge" data-from="AndroidApp" data-to="FastifyBackend" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="NFC Scan / Sync Batch" points="629.9684999999998,379.90000000000003 629.9684999999998,437.90000000000003 613.3163749999999,437.90000000000003 613.3163749999999,506.20000000000005 401.18749999999994,506.20000000000005 401.18749999999994,568.2" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Dashboard" data-to="FastifyBackend" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Roster Import / Review / Finalize" points="348.0924999999999,379.90000000000003 348.0924999999999,437.90000000000003 382.9558749999999,437.90000000000003 382.9558749999999,506.20000000000005 348.0924999999999,506.20000000000005 348.0924999999999,568.2" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="OpenAPISpec" data-to="FastifyBackend" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="Generates Types &amp; Validates" points="291.3492499999999,137.8 291.3492499999999,264.1 113,264.1 113,506.20000000000005 294.99749999999995,506.20000000000005 294.99749999999995,568.2" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="OpenAPISpec" data-to="Dashboard" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="Generates Types &amp; Client" points="366.3037499999999,137.8 366.3037499999999,195.8 403.6024999999999,195.8 403.6024999999999,264.1 348.0924999999999,264.1 348.0925,326.1" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="OpenAPISpec" data-to="AndroidApp" data-style="dotted" data-arrow-start="false" data-arrow-end="true" data-label="Generates Request/Response Models" points="441.25824999999986,137.8 441.25824999999986,195.8 589.9446249999999,195.8 589.9446249999999,264.1 629.9684999999998,264.1 629.9684999999998,326.1" fill="none" stroke="var(--_line)" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="ReconciliationEngine" data-to="PostgresDB" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="474.3957499999999,723.8000000000001 474.3957499999999,843.8000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="FastifyBackend" data-to="AuthPackageSigner" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="348.0925,622 348.0925,646 221.78924999999998,646 221.78924999999998,670" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="FastifyBackend" data-to="ReconciliationEngine" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="348.0925,622 348.0925,646 474.3957499999999,646 474.3957499999999,670" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="AndroidApp" data-to="FastifyBackend" data-label="NFC Scan / Sync Batch">
+  <rect x="549.8163749999999" y="444.90000000000003" width="126.35200000000002" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="612.9923749999999" y="460.05" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">NFC Scan / Sync Batch</text>
+</g>
+<g class="edge-label" data-from="Dashboard" data-to="FastifyBackend" data-label="Roster Import / Review / Finalize">
+  <rect x="299.9558749999999" y="444.90000000000003" width="165.556" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="382.7338749999999" y="460.05" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Roster Import / Review / Finalize</text>
+</g>
+<g class="edge-label" data-from="OpenAPISpec" data-to="FastifyBackend" data-label="Generates Types &amp; Validates">
+  <rect x="36" y="444.90000000000003" width="153.67600000000002" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="112.83800000000001" y="460.05" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Generates Types &amp; Validates</text>
+</g>
+<g class="edge-label" data-from="OpenAPISpec" data-to="Dashboard" data-label="Generates Types &amp; Client">
+  <rect x="335.60249999999985" y="202.8" width="135.856" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="403.53049999999985" y="217.95000000000002" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Generates Types &amp; Client</text>
+</g>
+<g class="edge-label" data-from="OpenAPISpec" data-to="AndroidApp" data-label="Generates Request/Response Models">
+  <rect x="490.94462499999986" y="202.8" width="197.038" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="589.4636249999999" y="217.95000000000002" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Generates Request/Response Models</text>
+</g>
+<g class="node" data-id="AndroidApp" data-label="Android Scanner App
+(Kotlin, Compose, Room, WorkManager)" data-shape="rectangle">
+  <rect x="494.50899999999984" y="326.1" width="270.919" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="629.9684999999998" y="353" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="629.9684999999998" dy="-3.9000000000000012">Android Scanner App</tspan><tspan x="629.9684999999998" dy="16.900000000000002">(Kotlin, Compose, Room, WorkManager)</tspan></text>
+</g>
+<g class="node" data-id="Dashboard" data-label="Web Dashboard
+(React, Vite, TypeScript, Tailwind)" data-shape="rectangle">
+  <rect x="229.676" y="326.1" width="236.83299999999988" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="348.0924999999999" y="353" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="348.0924999999999" dy="-3.9000000000000012">Web Dashboard</tspan><tspan x="348.0924999999999" dy="16.900000000000002">(React, Vite, TypeScript, Tailwind)</tspan></text>
+</g>
+<g class="node" data-id="OpenAPISpec" data-label="packages/contracts
+(OpenAPI 3.1 Spec, Zod Schemas, TS Types)" data-shape="rectangle">
+  <rect x="216.39474999999996" y="84" width="299.8179999999999" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="366.3037499999999" y="110.9" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="366.3037499999999" dy="-3.9000000000000012">packages/contracts</tspan><tspan x="366.3037499999999" dy="16.900000000000002">(OpenAPI 3.1 Spec, Zod Schemas, TS Types)</tspan></text>
+</g>
+<g class="node" data-id="FastifyBackend" data-label="Fastify Backend API
+(Node.js, TypeScript, Kysely)" data-shape="rectangle">
+  <rect x="241.90249999999997" y="568.2" width="212.37999999999994" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="348.0925" y="595.1" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="348.0925" dy="-3.9000000000000012">Fastify Backend API</tspan><tspan x="348.0925" dy="16.900000000000002">(Node.js, TypeScript, Kysely)</tspan></text>
+</g>
+<g class="node" data-id="AuthPackageSigner" data-label="Cryptographic Signer
+(Ed25519 Package Signing)" data-shape="rectangle">
+  <rect x="121.52724999999998" y="670" width="200.52399999999997" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="221.78924999999998" y="696.9" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="221.78924999999998" dy="-3.9000000000000012">Cryptographic Signer</tspan><tspan x="221.78924999999998" dy="16.900000000000002">(Ed25519 Package Signing)</tspan></text>
+</g>
+<g class="node" data-id="ReconciliationEngine" data-label="Reconciliation &amp; Finalization Engine
+(Serial/Repeat/Conflict Resolver)" data-shape="rectangle">
+  <rect x="350.0512499999999" y="670" width="248.68899999999996" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="474.3957499999999" y="696.9" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="474.3957499999999" dy="-3.9000000000000012">Reconciliation &amp; Finalization Engine</tspan><tspan x="474.3957499999999" dy="16.900000000000002">(Serial/Repeat/Conflict Resolver)</tspan></text>
+</g>
+<g class="node" data-id="PostgresDB" data-label="PostgreSQL 18
+Tenants, Sessions, Rosters,
+Events, Attendance, Audit" data-shape="cylinder">
+  <rect x="370.4287499999999" y="850.8000000000001" width="207.93399999999997" height="70.7" fill="var(--_node-fill)" stroke="none" />
+  <line x1="370.4287499999999" y1="850.8000000000001" x2="370.4287499999999" y2="921.5000000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <line x1="578.3627499999999" y1="850.8000000000001" x2="578.3627499999999" y2="921.5000000000001" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="474.3957499999999" cy="921.5000000000001" rx="103.96699999999998" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <ellipse cx="474.3957499999999" cy="850.8000000000001" rx="103.96699999999998" ry="7" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="474.3957499999999" y="886.1500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="474.3957499999999" dy="-12.350000000000001">PostgreSQL 18</tspan><tspan x="474.3957499999999" dy="16.900000000000002">Tenants, Sessions, Rosters,</tspan><tspan x="474.3957499999999" dy="16.900000000000002">Events, Attendance, Audit</tspan></text>
+</g>
+</svg>

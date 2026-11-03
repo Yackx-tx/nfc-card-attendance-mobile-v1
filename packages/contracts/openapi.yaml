@@ -1,0 +1,625 @@
+openapi: 3.1.0
+info:
+  title: AMAS API
+  version: 1.0.0
+  description: Authoritative API for Automated Mobile Attendance System (AMAS)
+servers:
+  - url: /api/v1
+    description: Current Environment Base API
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - statusCode
+        - error
+        - message
+      properties:
+        statusCode:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    UserRole:
+      type: string
+      enum: [ADMIN, OPERATOR, REVIEWER, REPORT_VIEWER]
+
+    SessionState:
+      type: string
+      enum: [DRAFT, OPEN, REVIEW, FINALIZED, REOPENED, CANCELLED]
+
+    EventOutcome:
+      type: string
+      enum: [ACCEPTED, DUPLICATE, REJECTED, NEEDS_REVIEW]
+
+    AttendanceSource:
+      type: string
+      enum: [ONLINE_SCAN, OFFLINE_SYNC, MANUAL_AMENDMENT]
+
+    LoginRequest:
+      type: object
+      required:
+        - orgSlug
+        - email
+        - password
+      properties:
+        orgSlug:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+        - user
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        user:
+          type: object
+          required:
+            - id
+            - organizationId
+            - email
+            - role
+          properties:
+            id:
+              type: string
+              format: uuid
+            organizationId:
+              type: string
+              format: uuid
+            email:
+              type: string
+            role:
+              $ref: '#/components/schemas/UserRole'
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+
+    RefreshTokenResponse:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+
+    RegisterCardRequest:
+      type: object
+      required:
+        - cardUid
+        - personId
+      properties:
+        cardUid:
+          type: string
+          description: Normalized uppercase hex UID
+        personId:
+          type: string
+          format: uuid
+
+    CardResponse:
+      type: object
+      required:
+        - id
+        - cardUid
+        - personId
+        - isActive
+        - assignedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        cardUid:
+          type: string
+        personId:
+          type: string
+          format: uuid
+        personName:
+          type: string
+        externalId:
+          type: string
+        isActive:
+          type: boolean
+        assignedAt:
+          type: string
+          format: date-time
+
+    Person:
+      type: object
+      required:
+        - id
+        - externalId
+        - fullName
+      properties:
+        id:
+          type: string
+          format: uuid
+        externalId:
+          type: string
+          description: Preserves leading zeros (e.g. 00123)
+        fullName:
+          type: string
+        email:
+          type: string
+        groupName:
+          type: string
+        cardUid:
+          type: string
+
+    RosterImportPreviewResponse:
+      type: object
+      required:
+        - totalRows
+        - validCount
+        - duplicateCount
+        - previewRows
+        - errors
+      properties:
+        totalRows:
+          type: integer
+        validCount:
+          type: integer
+        duplicateCount:
+          type: integer
+        previewRows:
+          type: array
+          items:
+            type: object
+            required:
+              - externalId
+              - fullName
+            properties:
+              externalId:
+                type: string
+              fullName:
+                type: string
+              email:
+                type: string
+              groupName:
+                type: string
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+              - rowNumber
+              - error
+            properties:
+              rowNumber:
+                type: integer
+              error:
+                type: string
+
+    RosterImportCommitResponse:
+      type: object
+      required:
+        - rosterVersionId
+        - versionNumber
+        - totalMembers
+        - digestSha256
+      properties:
+        rosterVersionId:
+          type: string
+          format: uuid
+        versionNumber:
+          type: integer
+        totalMembers:
+          type: integer
+        digestSha256:
+          type: string
+
+    CreateSessionRequest:
+      type: object
+      required:
+        - title
+        - rosterVersionId
+        - scheduledStart
+        - scheduledEnd
+      properties:
+        title:
+          type: string
+        rosterVersionId:
+          type: string
+          format: uuid
+        scheduledStart:
+          type: string
+          format: date-time
+        scheduledEnd:
+          type: string
+          format: date-time
+
+    SessionResponse:
+      type: object
+      required:
+        - id
+        - organizationId
+        - title
+        - rosterVersionId
+        - state
+        - scheduledStart
+        - scheduledEnd
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        organizationId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        rosterVersionId:
+          type: string
+          format: uuid
+        state:
+          $ref: '#/components/schemas/SessionState'
+        scheduledStart:
+          type: string
+          format: date-time
+        scheduledEnd:
+          type: string
+          format: date-time
+        finalizedAt:
+          type: string
+          format: date-time
+        finalizedBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+
+    OfflineAuthorizationPackage:
+      type: object
+      required:
+        - header
+        - payload
+        - signature
+      properties:
+        header:
+          type: object
+          required:
+            - version
+            - algorithm
+            - issuedAt
+            - expiresAt
+          properties:
+            version:
+              type: integer
+            algorithm:
+              type: string
+            issuedAt:
+              type: integer
+            expiresAt:
+              type: integer
+        payload:
+          type: object
+          required:
+            - authorizationId
+            - organizationId
+            - sessionId
+            - deviceFingerprint
+            - rosterVersion
+            - rosterDigest
+            - peopleMappings
+            - rules
+          properties:
+            authorizationId:
+              type: string
+              format: uuid
+            organizationId:
+              type: string
+              format: uuid
+            sessionId:
+              type: string
+              format: uuid
+            deviceFingerprint:
+              type: string
+            rosterVersion:
+              type: integer
+            rosterDigest:
+              type: string
+            peopleMappings:
+              type: array
+              items:
+                type: object
+                required:
+                  - personId
+                  - externalId
+                  - fullName
+                  - cardUid
+                properties:
+                  personId:
+                    type: string
+                    format: uuid
+                  externalId:
+                    type: string
+                  fullName:
+                    type: string
+                  cardUid:
+                    type: string
+            rules:
+              type: object
+              required:
+                - lateAfter
+                - maxLeaseSeconds
+              properties:
+                lateAfter:
+                  type: string
+                  format: date-time
+                maxLeaseSeconds:
+                  type: integer
+        signature:
+          type: string
+          description: Base64-encoded Ed25519 signature
+
+    ScanEventItem:
+      type: object
+      required:
+        - eventId
+        - cardUid
+        - deviceEventTime
+      properties:
+        eventId:
+          type: string
+          format: uuid
+          description: Client-generated unique UUID
+        authorizationId:
+          type: string
+          format: uuid
+        cardUid:
+          type: string
+        deviceFingerprint:
+          type: string
+        deviceEventTime:
+          type: string
+          format: date-time
+        monotonicElapsedMs:
+          type: integer
+
+    ScanEventOutcome:
+      type: object
+      required:
+        - eventId
+        - outcome
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        outcome:
+          $ref: '#/components/schemas/EventOutcome'
+        reason:
+          type: string
+        personId:
+          type: string
+          format: uuid
+        personName:
+          type: string
+        isLate:
+          type: boolean
+        markedPresentAt:
+          type: string
+          format: date-time
+
+    SyncBatchRequest:
+      type: object
+      required:
+        - events
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScanEventItem'
+
+    SyncBatchResponse:
+      type: object
+      required:
+        - processed
+        - outcomes
+      properties:
+        processed:
+          type: integer
+        outcomes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScanEventOutcome'
+
+    FinalizeSessionResponse:
+      type: object
+      required:
+        - sessionId
+        - state
+        - finalizedAt
+        - finalizedBy
+        - totalAccepted
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        state:
+          $ref: '#/components/schemas/SessionState'
+        finalizedAt:
+          type: string
+          format: date-time
+        finalizedBy:
+          type: string
+          format: uuid
+        totalAccepted:
+          type: integer
+        snapshot:
+          type: object
+          additionalProperties: true
+
+paths:
+  /auth/login:
+    post:
+      summary: Login user and return JWT + Refresh Token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      summary: Refresh JWT access token with rotating refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenResponse'
+        '401':
+          description: Invalid or revoked refresh token
+
+  /sessions/{id}/offline-package:
+    get:
+      summary: Issue signed Ed25519 offline authorization package
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: deviceFingerprint
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Offline package issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfflineAuthorizationPackage'
+
+  /sessions/{id}/scan:
+    post:
+      summary: Authoritative online card scan
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScanEventItem'
+      responses:
+        '200':
+          description: Scan outcome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanEventOutcome'
+
+  /sessions/{id}/sync:
+    post:
+      summary: Synchronize batch of offline scan events
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncBatchRequest'
+      responses:
+        '200':
+          description: Batch sync outcomes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncBatchResponse'
+
+  /sessions/{id}/finalize:
+    post:
+      summary: Finalize attendance session (blocked by pending or unresolved events)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Session finalized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalizeSessionResponse'
+        '409':
+          description: Conflict - unresolved events exist or pending sync blocks finalization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

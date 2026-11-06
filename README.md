@@ -94,8 +94,7 @@ Create `.env` in the repository root:
 PORT=4000
 HOST=0.0.0.0
 NODE_ENV=development
-DATABASE_URL=postgresql://postgres:yannick123@localhost:5432/amas_dev
-TEST_DATABASE_URL=postgresql://postgres:yannick123@localhost:5432/amas_test
+DATABASE_URL=postgresql://postgres:[YOUR_PASSOWRD]@localhost:5432/amas_dev
 JWT_SECRET=super-secret-amas-dev-key-change-in-production-min-32-chars-long
 JWT_EXPIRES_IN=15m
 REFRESH_TOKEN_EXPIRES_DAYS=7

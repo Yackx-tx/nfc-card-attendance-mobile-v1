@@ -49,6 +49,30 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         repository.scheduleSync()
     }
 
+    fun loadServerSession(baseUrl: String, sessionId: String, token: String? = null) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                sessionId = sessionId,
+                sessionTitle = "Session: $sessionId (Fetching...)"
+            )
+            val result = repository.fetchAndStoreServerPackage(
+                baseUrl = baseUrl,
+                sessionId = sessionId,
+                authToken = token,
+                deviceFingerprint = "android-device-" + android.os.Build.SERIAL
+            )
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    sessionTitle = "Session Active (Server Authorized)"
+                )
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    sessionTitle = "Session Load Failed: ${result.exceptionOrNull()?.message}"
+                )
+            }
+        }
+    }
+
     fun seedDemoRosterIfEmpty() {
         viewModelScope.launch {
             val existing = repository.getActiveAuthorization(_uiState.value.sessionId)

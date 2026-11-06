@@ -20,7 +20,7 @@ class OutboxStateUnitTest {
     fun verifySha256Digest_matchesExpected() {
         val payload = "{\"test\":\"roster\"}"
         // sha256 of payload
-        val expected = "579895085c80bb0d97b0a8806283ff1f98bc195f46401015f37217db58dd8e04"
+        val expected = "53e2ad240c1dbe8d202412c7f1207798da0fb268db89d4e7bebacdedc3a893a2"
         assertTrue(Ed25519Verifier.verifySha256Digest(payload, expected))
         assertFalse(Ed25519Verifier.verifySha256Digest(payload, "invalid_digest"))
     }

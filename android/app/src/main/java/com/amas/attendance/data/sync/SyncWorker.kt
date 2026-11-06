@@ -53,8 +53,10 @@ class SyncWorker(
                     put("events", jsonEvents)
                 }
 
-                // Read server URL from prefs or default local test IP (10.0.2.2 for emulator or localhost)
-                val serverUrl = "http://10.0.2.2:4000/api/v1/sessions/$sessionId/sync"
+                // Read server URL from SharedPreferences or default to localhost:4000 (with adb reverse) or 10.0.2.2:4000 (emulator)
+                val prefs = applicationContext.getSharedPreferences("amas_prefs", Context.MODE_PRIVATE)
+                val baseUrl = prefs.getString("server_base_url", "http://10.0.2.2:4000") ?: "http://10.0.2.2:4000"
+                val serverUrl = "$baseUrl/api/v1/sessions/$sessionId/sync"
 
                 val requestBody = payload.toString().toRequestBody("application/json".toMediaType())
                 val request = Request.Builder()
@@ -72,7 +74,7 @@ class SyncWorker(
                         val outcomeObj = outcomes.getJSONObject(i)
                         val eventId = outcomeObj.getString("eventId")
                         val outcome = outcomeObj.getString("outcome")
-                        val reason = outcomeObj.optString("reason", null)
+                        val reason = if (outcomeObj.has("reason") && !outcomeObj.isNull("reason")) outcomeObj.getString("reason") else null
 
                         // Durably update Room outbox with server outcome
                         val syncState = when (outcome) {

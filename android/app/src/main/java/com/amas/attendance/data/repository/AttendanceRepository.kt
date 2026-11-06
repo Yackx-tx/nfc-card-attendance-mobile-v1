@@ -38,6 +38,63 @@ class AttendanceRepository(private val context: Context) {
     val pendingCount: Flow<Int> = outboxDao.observePendingCount()
     val allEvents: Flow<List<OutboxEntity>> = outboxDao.observeAllEvents()
 
+    suspend fun fetchAndStoreServerPackage(
+        baseUrl: String,
+        sessionId: String,
+        authToken: String?,
+        deviceFingerprint: String
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val url = "$baseUrl/api/v1/sessions/$sessionId/offline-package?deviceFingerprint=$deviceFingerprint"
+            val requestBuilder = okhttp3.Request.Builder().url(url)
+            if (!authToken.isNullOrBlank()) {
+                requestBuilder.addHeader("Authorization", "Bearer $authToken")
+            }
+            val client = okhttp3.OkHttpClient()
+            val response = client.newCall(requestBuilder.build()).execute()
+            if (!response.isSuccessful) {
+                return@withContext Result.failure(Exception("Failed to fetch session package: HTTP ${response.code}"))
+            }
+
+            val body = response.body?.string() ?: return@withContext Result.failure(Exception("Empty response body"))
+            val json = org.json.JSONObject(body)
+            val header = json.getJSONObject("header")
+            val payload = json.getJSONObject("payload")
+            val signature = json.getString("signature")
+
+            val peopleArray = payload.getJSONArray("peopleMappings")
+            val peopleList = mutableListOf<CachedRosterEntity>()
+            for (i in 0 until peopleArray.length()) {
+                val p = peopleArray.getJSONObject(i)
+                peopleList.add(
+                    CachedRosterEntity(
+                        personId = p.getString("personId"),
+                        externalId = p.getString("externalId"),
+                        fullName = p.getString("fullName"),
+                        cardUid = p.optString("cardUid", "").replace(":", "").uppercase(Locale.ROOT),
+                        rosterVersion = payload.getInt("rosterVersion")
+                    )
+                )
+            }
+
+            val authEntity = OfflineAuthorizationEntity(
+                authorizationId = payload.getString("authorizationId"),
+                sessionId = payload.getString("sessionId"),
+                organizationId = payload.getString("organizationId"),
+                issuedAtEpochSec = header.getLong("issuedAt"),
+                expiresAtEpochSec = header.getLong("expiresAt"),
+                rosterVersion = payload.getInt("rosterVersion"),
+                rosterDigest = payload.getString("rosterDigest"),
+                signature = signature
+            )
+
+            saveOfflinePackage(authEntity, peopleList)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun saveOfflinePackage(
         auth: OfflineAuthorizationEntity,
         people: List<CachedRosterEntity>

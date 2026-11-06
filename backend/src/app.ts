@@ -188,6 +188,19 @@ export function buildApp(): FastifyInstance {
     return rows;
   });
 
+  app.get('/api/v1/roster-versions', { preHandler: [(app as any).authenticate] }, async (request) => {
+    const { rows } = await pool.query(
+      `SELECT rv.id, rv.version_number, rv.created_at, COUNT(rm.person_id)::int as total_members
+       FROM roster_versions rv
+       LEFT JOIN roster_memberships rm ON rm.roster_version_id = rv.id
+       WHERE rv.organization_id = $1
+       GROUP BY rv.id, rv.version_number, rv.created_at
+       ORDER BY rv.version_number DESC`,
+      [request.userContext!.organizationId]
+    );
+    return rows;
+  });
+
   // --- Cards Routes ---
   app.post('/api/v1/cards/register', { preHandler: [(app as any).authenticate] }, async (request, reply) => {
     const body = RegisterCardRequestSchema.parse(request.body);
@@ -219,6 +232,53 @@ export function buildApp(): FastifyInstance {
       [request.userContext!.organizationId]
     );
     return rows;
+  });
+
+  app.get('/api/v1/sessions/:id/attendance', { preHandler: [(app as any).authenticate] }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const session = await getSessionById(id, request.userContext!.organizationId);
+    if (!session) {
+      return reply.status(404).send({ statusCode: 404, error: 'Not Found', message: 'Session not found' });
+    }
+
+    const { rows: attendeeRows } = await pool.query(
+      `SELECT p.id as person_id, p.external_id, p.full_name, p.group_name, c.card_uid,
+              ar.marked_present_at, ar.is_late, ar.source, ar.created_at as check_in_created_at
+       FROM roster_memberships rm
+       JOIN people p ON p.id = rm.person_id
+       LEFT JOIN cards c ON c.person_id = p.id AND c.is_active = TRUE
+       LEFT JOIN attendance_records ar ON ar.session_id = $1 AND ar.person_id = p.id
+       WHERE rm.roster_version_id = $2
+       ORDER BY ar.marked_present_at DESC NULLS LAST, p.full_name ASC`,
+      [id, session.roster_version_id]
+    );
+
+    const { rows: recentEvents } = await pool.query(
+      `SELECT ae.id, ae.event_id, ae.card_uid_logged, ae.outcome, ae.outcome_reason,
+              ae.device_event_time, ae.processed_at as created_at, p.full_name as person_name, p.external_id
+       FROM attendance_events ae
+       LEFT JOIN people p ON p.id = ae.person_id
+       WHERE ae.session_id = $1
+       ORDER BY ae.processed_at DESC
+       LIMIT 50`,
+      [id]
+    );
+
+    const totalExpected = attendeeRows.length;
+    const presentCount = attendeeRows.filter(r => r.marked_present_at !== null).length;
+    const lateCount = attendeeRows.filter(r => r.is_late === true).length;
+
+    return {
+      session,
+      summary: {
+        totalExpected,
+        presentCount,
+        absentCount: totalExpected - presentCount,
+        lateCount,
+      },
+      attendees: attendeeRows,
+      recentEvents,
+    };
   });
 
   app.get('/api/v1/sessions/:id', { preHandler: [(app as any).authenticate] }, async (request, reply) => {

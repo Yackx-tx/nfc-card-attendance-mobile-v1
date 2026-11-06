@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { apiFetch } from '../api/client';
-import { Plus, CheckCircle, ShieldAlert, Lock, Play, RefreshCw, Smartphone } from 'lucide-react';
+import { Plus, CheckCircle, ShieldAlert, Lock, Play, RefreshCw, Smartphone, Radio } from 'lucide-react';
 
-export const Sessions: React.FC = () => {
+interface SessionsProps {
+  onNavigateToScanner?: () => void;
+}
+
+export const Sessions: React.FC<SessionsProps> = ({ onNavigateToScanner }) => {
   const [sessions, setSessions] = useState<any[]>([]);
+  const [rosterVersions, setRosterVersions] = useState<any[]>([]);
   const [selectedSession, setSelectedSession] = useState<any | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [title, setTitle] = useState('');
@@ -23,8 +28,21 @@ export const Sessions: React.FC = () => {
     }
   };
 
+  const fetchRosterVersions = async () => {
+    try {
+      const data = await apiFetch<any[]>('/roster-versions');
+      setRosterVersions(data);
+      if (data.length > 0 && !rosterVersionId) {
+        setRosterVersionId(data[0].id);
+      }
+    } catch {
+      // Non-fatal if roster versions fail to load
+    }
+  };
+
   useEffect(() => {
     fetchSessions();
+    fetchRosterVersions();
   }, []);
 
   const handleCreateSession = async (e: React.FormEvent) => {
@@ -216,6 +234,16 @@ export const Sessions: React.FC = () => {
 
               {selectedSession.state === 'OPEN' && (
                 <>
+                  {onNavigateToScanner && (
+                    <button
+                      onClick={onNavigateToScanner}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm"
+                    >
+                      <Radio className="w-3.5 h-3.5" />
+                      <span>Launch Live USB Scanner</span>
+                    </button>
+                  )}
+
                   <button
                     onClick={() => handleGetOfflinePackage(selectedSession.id)}
                     className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow-sm"
@@ -317,15 +345,30 @@ export const Sessions: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Roster Version UUID</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Paste roster_version_id"
-                  value={rosterVersionId}
-                  onChange={(e) => setRosterVersionId(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-mono rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
+                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Target Roster Version</label>
+                {rosterVersions.length > 0 ? (
+                  <select
+                    required
+                    value={rosterVersionId}
+                    onChange={(e) => setRosterVersionId(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
+                  >
+                    {rosterVersions.map((rv) => (
+                      <option key={rv.id} value={rv.id}>
+                        Version {rv.version_number} ({rv.total_members} students) - {new Date(rv.created_at).toLocaleDateString()}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    required
+                    placeholder="Paste roster_version_id"
+                    value={rosterVersionId}
+                    onChange={(e) => setRosterVersionId(e.target.value)}
+                    className="w-full px-3 py-2 text-sm font-mono rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                )}
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">
